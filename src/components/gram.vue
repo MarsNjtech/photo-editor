@@ -8,12 +8,12 @@
 
 <script>
 import $ from 'jquery'
-
+import filters from '../filter/instaFilters'
 export default {
   name: 'gram',
   data () {
     return {
-      filters: ['xpro2', 'aden', 'amaro', 'brannan', 'willow', 'perpetua', 'clarendon', 'reyes', 'earlybird', 'lofi']
+      filters: ['moon', 'aden', 'amaro', 'brannan', 'willow', 'perpetua', 'clarendon', 'reyes', 'earlybird', 'lofi']
     }
   },
   computed: {
@@ -23,9 +23,34 @@ export default {
   },
   methods: {
     changeStyle (style) {
-      const image = $('.cropper-canvas').children('img')
-      image.removeAttr('class')
-      image.addClass(style)
+      const image = $('.canvas').children('img')
+      const innerImage = $('.cropper-canvas').children('img')
+      console.log(style)
+      innerImage.removeAttr('class')
+      innerImage.addClass(style)
+      /* 删除原来的元素 */
+      $('#newCanvas').remove()
+      const newCanvas = document.createElement('canvas')
+      newCanvas.id = 'newCanvas'
+      /* 获取原始的图片大小 */
+      newCanvas.width = image[0].naturalWidth
+      newCanvas.height = image[0].naturalHeight
+      /* 隐藏添加的元素 */
+      $('#newCanvas').addClass('cropper-hidden')
+      $('.cropper-canvas').append(newCanvas)
+      /* 获取 canvas 上下文 */
+      const context = $('#newCanvas')[0].getContext('2d')
+      context.drawImage(image[0], 0, 0, newCanvas.width, newCanvas.height)
+      const pixels = context.getImageData(0, 0, newCanvas.width, newCanvas.height)
+      /* 滤镜操作 */
+      filters.forEach(element => {
+        if (element.name === style) {
+          context.putImageData(element(pixels), 0, 0)
+        }
+      })
+      this.$store.dispatch('loader/update', {
+        url: $('#newCanvas')[0].toDataURL()
+      })
     }
   }
 }

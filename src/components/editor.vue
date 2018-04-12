@@ -13,6 +13,9 @@
         <button class="toolbar__button" data-action="flip-horizontal" title="Flip Horizontal (H)"><span class="fa fa-arrows-h"></span></button>
         <button class="toolbar__button" data-action="flip-vertical" title="Flip Vertical (V)"><span class="fa fa-arrows-v"></span></button>
         <button type="button" class="toolbar__button" data-action="cropTest" title="OK (Enter)" v-show="editor.cropping"><span class="fa fa-check"></span></button>
+        <button type="button" class="toolbar__button" data-action="clear" title="Cancel (Esc)" v-show="editor.cropping"><span class="fa fa-ban"></span></button>
+        <!-- <button class="toolbar__button" title="Download" data-action="download" :download="loader.name" v-if="loader.loaded"><span class="fa fa-download"></span></button> -->
+        <a class="nav__button nav__button--success" title="Download" :download="loader.name" :href="loader.url" v-if="downloadable && loader.loaded"><span class="fa fa-download"></span></a>
     </div>
     </div>
 </template>
@@ -27,7 +30,8 @@ export default {
       cropper: null,
       canvasData: null,
       cropBoxData: null,
-      data: null
+      data: null,
+      downloadable: typeof document.createElement('a').download !== 'undefined'
     }
   },
 
@@ -60,6 +64,12 @@ export default {
           break
         case 'cropTest':
           this.cropTest()
+          break
+        case 'clear':
+          this.clear()
+          break
+        case 'download':
+          this.download()
           break
         default:
       }
@@ -111,6 +121,16 @@ export default {
           cropped: false
         })
       }
+    },
+
+    clear () {
+      if (this.editor.cropping) {
+        this.cropper.clear()
+        this.cropper.setDragMode('move')
+        this.$store.dispatch('editor/update', {
+          cropping: false
+        })
+      }
     }
   }
 }
@@ -146,7 +166,7 @@ export default {
     left: 50%;
     margin-left: -128px;
     position: absolute;
-    width: 288px;
+    width: 352px;
     z-index: 2015;
   }
 
@@ -161,6 +181,29 @@ export default {
     height: 32px;
     text-align: center;
     width: 32px;
+  }
+
+  .toolbar a {
+    background-color: transparent;
+    border-width: 0;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    float: left;
+    font-size: 14px;
+    height: 32px;
+    text-align: center;
+    width: 32px;
+    line-height: 32px;
+  }
+
+  .toolbar a:hover {
+    background-color: #0074d9;
+    color: #fff;
+  }
+
+  .toolbar a:focus {
+    outline: none;
   }
 
   .toolbar button:focus {
