@@ -14,7 +14,6 @@
         <button class="toolbar__button" data-action="flip-vertical" title="Flip Vertical (V)"><span class="fa fa-arrows-v"></span></button>
         <button type="button" class="toolbar__button" data-action="cropTest" title="OK (Enter)" v-show="editor.cropping"><span class="fa fa-check"></span></button>
         <button type="button" class="toolbar__button" data-action="clear" title="Cancel (Esc)" v-show="editor.cropping"><span class="fa fa-ban"></span></button>
-        <!-- <button class="toolbar__button" title="Download" data-action="download" :download="loader.name" v-if="loader.loaded"><span class="fa fa-download"></span></button> -->
         <a class="nav__button nav__button--success" title="Download" :download="loader.name" :href="loader.url" v-if="downloadable && loader.loaded"><span class="fa fa-download"></span></a>
     </div>
     </div>
@@ -70,6 +69,18 @@ export default {
           break
         case 'download':
           this.download()
+          break
+        case 'rotate-left':
+          cropper.rotate(-90)
+          break
+        case 'rotate-right':
+          cropper.rotate(90)
+          break
+        case 'flip-horizontal':
+          cropper.scaleX(-cropper.getData().scaleX || -1)
+          break
+        case 'flip-vertical':
+          cropper.scaleY(-cropper.getData().scaleY || -1)
           break
         default:
       }
